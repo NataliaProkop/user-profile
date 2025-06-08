@@ -5,7 +5,11 @@ export interface UserProfile {
   phone: string;
   birthday: Date;
   about?: string;
-  avatar?: string;
+  avatar?: {
+    small?: string;
+    medium?: string;
+    large?: string;
+  };
   avatarName?: string;
 }
 

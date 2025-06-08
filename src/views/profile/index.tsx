@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { DATE_FORMAT } from "@/types";
 import type { FC } from "react";
+import { IMAGE_SIZES } from "../user-form/user-form.types";
 
 const Profile: FC = () => {
   const { profile } = useProfile();
@@ -17,12 +18,22 @@ const Profile: FC = () => {
       <div className="profile-view__profile-box">
         <div className="profile-view__avatar-container">
           {profile?.avatar ? (
-            <img
-              loading="lazy"
-              src={profile.avatar}
-              alt={`${profile.firstName} ${profile.lastName} avatar`}
-              className="profile-view__avatar"
-            />
+            <picture>
+              <source
+                media={`(max-width: ${IMAGE_SIZES.medium})`}
+                srcSet={profile.avatar.small}
+              />
+              <source
+                media={`(max-width: ${IMAGE_SIZES.large})`}
+                srcSet={profile.avatar.medium}
+              />
+              <img
+                loading="lazy"
+                className="profile-view__avatar"
+                src={profile.avatar.large}
+                alt="User avatar"
+              />
+            </picture>
           ) : (
             <UserAvatar size={120} aria-label="User avatar placeholder" />
           )}

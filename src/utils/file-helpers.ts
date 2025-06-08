@@ -1,14 +1,51 @@
-export const converImgToBase64 = (blob: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", (e) => {
-      resolve(e.target?.result as string);
+export const resizeAndConvertToBase64 = async (
+  file: Blob,
+  maxWidth: number,
+  maxHeight: number,
+  quality = 0.7
+): Promise<string> => {
+  // Load image from blob/file
+  const loadImage = (blob: Blob): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+      img.onerror = (err) => {
+        URL.revokeObjectURL(url);
+        reject(err);
+      };
+
+      img.src = url;
     });
-    reader.readAsDataURL(blob);
-    reader.onerror = () => {
-      reject(new Error("Unable to read file."));
-    };
-  });
+
+  const img = await loadImage(file);
+
+  // Calculate new size preserving aspect ratio
+  let { width, height } = img;
+  if (width > maxWidth) {
+    height = (maxWidth / width) * height;
+    width = maxWidth;
+  }
+  if (height > maxHeight) {
+    width = (maxHeight / height) * width;
+    height = maxHeight;
+  }
+
+  // Draw to canvas and compress
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Failed to get canvas context");
+
+  ctx.drawImage(img, 0, 0, width, height);
+
+  // Return compressed base64 string (JPEG)
+  return canvas.toDataURL("image/jpeg", quality);
 };
 
 export const converBase64ToFile = (

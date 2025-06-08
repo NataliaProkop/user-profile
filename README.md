@@ -1,54 +1,89 @@
-# React + TypeScript + Vite
+# User Profile App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a small single-page React application that allows users to fill out and view a user profile form.
 
-Currently, two official plugins are available:
+## Running the Project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Start development server:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+pnpm install
+pnpm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Stack and Tooling Decisions, Assumptions and Comments To Implementation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 2. Vite
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+I chose Vite as the build tool due lightweight setup and fast development experience and also because I wanted to learn and explore modern alternatives to traditional bundlers like Webpack.
+
+**Alternatives**:
+
+- Create React App (CRA): more mature but slower and less customizable.
+- Webpack: Powerful and highly customizable but requires more configuration.
+
+---
+
+### 3. React Hook Form + Yup Validation
+
+The form is built using React Hook Form because it is lightweight and intuitive. Validation is handled by Yup. Also I have the most experience with this setup
+
+**Alternatives**:
+
+- Formik
+- React Final Form
+- Zod (alternative to Yup for schema validation)
+
+**Validation Assumptions**:
+
+Since the only explicit requirement was to add validation, I made the following assumptions:
+
+- Required fields: firstName, lastName, email, phone, and birthday.
+- Optional fields: about and avatar.
+- Email: Validated for proper format using Yup’s built-in .email() method.
+- Phone: Assumed to be in international format. I used the yup-phone-lite library to validate phone numbers against international standards.
+- Birthday: Checked to ensure the date is not in the future using Yup’s .max(new Date()).
+- About: Limited to a maximum of 500 characters.
+- Avatar: Must be a .jpeg or .png image with a maximum file size of 2MB.
+
+---
+
+### 4. State Management via React Context
+
+Form data and user profile state are stored using React Context, which is suitable for smaller apps.
+
+**Alternatives**:
+
+Global state management libraries like:
+
+- Redux Toolkit
+- Zustand
+- MobX
+
+---
+
+### 5. Image Handling and Optimization
+
+The user can upload an avatar image. On the frontend:
+
+- The image is resized and compressed before being converted to Base64 using a utility that combines FileReader and Canvas APIs.
+- Images are conditionally resized based on responsive breakpoints.
+
+**In a real-world production setup**:
+
+- Image optimization would be handled on the server or via a CDN.
+- For static images or SSR (e.g., in a Next.js app), I would use the built-in `next/image` component for optimal performance and automatic responsive behavior.
+
+---
+
+### 6. Data Persistence
+
+Currently, the user profile is persisted in the browser using `sessionStorage`. The storage logic is encapsulated in `user-profile.service.ts` using three async-like functions:
+
+- `saveUserProfile`
+- `getUserProfile`
+- `clearUserProfile`
+
+Although `sessionStorage` is synchronous, wrapping these in promises allows for easy replacement with API calls in the future without changing how they’re consumed across the app.
+
+---

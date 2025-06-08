@@ -21,9 +21,13 @@ import { useProfile } from "@/context/user-profile.context";
 import "./user-form.scss";
 import { format } from "date-fns";
 import { useEffect, type FC } from "react";
-import { converBase64ToFile, converImgToBase64 } from "@/utils/file-helpers";
+import {
+  converBase64ToFile,
+  resizeAndConvertToBase64,
+} from "@/utils/file-helpers";
 import { schema } from "./user-form-schema";
 import {
+  IMAGE_SIZES,
   MAX_ABOUT_LENGTH,
   SUPPORTED_FORMATS,
   type UserFormData,
@@ -56,13 +60,14 @@ const UserForm: FC = () => {
           phone: profile.phone,
           about: profile.about,
           birthday: format(profile.birthday, DATE_FORMAT),
-          avatar: profile.avatar
-            ? converBase64ToFile(
-                profile.avatar,
-                profile.avatarName || "current_avatar",
-                "image/png"
-              )
-            : undefined,
+          avatar:
+            profile.avatar && profile.avatar.small
+              ? converBase64ToFile(
+                  profile.avatar.small,
+                  profile.avatarName || "current_avatar",
+                  "image/png"
+                )
+              : undefined,
         },
         { keepDirtyValues: true }
       );
@@ -73,14 +78,27 @@ const UserForm: FC = () => {
 
   const onSubmit: SubmitHandler<UserFormData> = async (data) => {
     const { avatar, birthday, ...userData } = data;
-    let base64Avatar;
-    if (avatar) {
-      base64Avatar = await converImgToBase64(avatar);
-    }
+
     await updateProfile({
       ...userData,
       birthday: new Date(birthday),
-      avatar: base64Avatar,
+      avatar: avatar && {
+        small: await resizeAndConvertToBase64(
+          avatar,
+          IMAGE_SIZES.small,
+          IMAGE_SIZES.small
+        ),
+        medium: await resizeAndConvertToBase64(
+          avatar,
+          IMAGE_SIZES.medium,
+          IMAGE_SIZES.medium
+        ),
+        large: await resizeAndConvertToBase64(
+          avatar,
+          IMAGE_SIZES.large,
+          IMAGE_SIZES.large
+        ),
+      },
       avatarName: avatar?.name,
     });
     navigate(ROUTES.profile);

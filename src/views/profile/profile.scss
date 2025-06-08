@@ -10,6 +10,7 @@
   &__edit-button {
     margin-left: auto;
   }
+
   &__profile-box {
     display: flex;
     flex-direction: column;
@@ -19,6 +20,7 @@
       align-items: flex-start;
     }
   }
+
   &__avatar {
     border-radius: 50%;
     max-width: 7.5rem;
