@@ -15,67 +15,74 @@ import {
   Form,
   FormGroup,
 } from "@carbon/react";
-import * as yup from "yup";
-import "yup-phone-lite";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { useProfile } from "@/context/user-profile.context";
 import "./user-form.scss";
-import type { UserProfile } from "@/types";
+import { format } from "date-fns";
+import { useEffect, type FC } from "react";
+import { converBase64ToFile, converImgToBase64 } from "@/utils/file-helpers";
+import { schema } from "./user-form-schema";
+import {
+  MAX_ABOUT_LENGTH,
+  SUPPORTED_FORMATS,
+  type UserFormData,
+} from "./user-form.types";
+import { DATE_FORMAT } from "@/types";
 
-interface UserFormData extends Omit<UserProfile, "avatar"> {
-  avatar?: Blob;
-}
-
-const schema = yup
-  .object({
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
-    email: yup.string().required().email(),
-    phone: yup.string().phone("IN").required(),
-    birthday: yup.date().max(new Date()).required(),
-    about: yup.string(),
-    avatar: yup.mixed(),
-  })
-  .required();
-
-function UserForm() {
+const UserForm: FC = () => {
   const navigate = useNavigate();
-
-  const formMethods = useForm({
+  const { profile, updateProfile } = useProfile();
+  const formMethods = useForm<UserFormData>({
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       phone: "",
       about: "",
+      birthday: "",
     },
     resolver: yupResolver(schema),
+    mode: "onBlur",
   });
-  const { updateProfile } = useProfile();
+
+  useEffect(() => {
+    if (profile) {
+      formMethods.reset(
+        {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+          phone: profile.phone,
+          about: profile.about,
+          birthday: format(profile.birthday, DATE_FORMAT),
+          avatar: profile.avatar
+            ? converBase64ToFile(
+                profile.avatar,
+                profile.avatarName || "current_avatar",
+                "image/png"
+              )
+            : undefined,
+        },
+        { keepDirtyValues: true }
+      );
+    }
+  }, [profile]);
 
   const { handleSubmit } = formMethods;
 
-  const converImgToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.addEventListener("load", (e) => {
-        resolve(e.target?.result as string);
-      });
-      reader.readAsDataURL(blob);
-      reader.onerror = () => {
-        reject(new Error("Unable to read.."));
-      };
-    });
-  };
-
   const onSubmit: SubmitHandler<UserFormData> = async (data) => {
-    const { avatar, ...userData } = data;
+    const { avatar, birthday, ...userData } = data;
     let base64Avatar;
     if (avatar) {
       base64Avatar = await converImgToBase64(avatar);
     }
-    await updateProfile({ ...userData, avatar: base64Avatar });
+    await updateProfile({
+      ...userData,
+      birthday: new Date(birthday),
+      avatar: base64Avatar,
+      avatarName: avatar?.name,
+    });
     navigate(ROUTES.profile);
   };
 
@@ -124,15 +131,21 @@ function UserForm() {
                     id="phone-number"
                     labelText="Phone Number"
                     autoComplete="tel"
+                    placeholder="+123456789"
                   />
                 </Column>
                 <Column sm={4} md={8} lg={8}>
                   <FormDatePickerInput
-                    className="user-form__date-picker"
+                    datePickerProps={{
+                      datePickerType: "single",
+                      className: "user-form__date-picker",
+                    }}
+                    datePickerInputProps={{
+                      id: "birthday",
+                      labelText: "Date of Birth",
+                      placeholder: DATE_FORMAT,
+                    }}
                     name="birthday"
-                    id="birthday"
-                    labelText="Date of Birth"
-                    placeholder="mm/dd/yyyy"
                   />
                 </Column>
               </Grid>
@@ -143,12 +156,17 @@ function UserForm() {
               rows={5}
               placeholder="Tell us about yourself..."
               labelText="About me"
+              enableCounter
+              maxCount={MAX_ABOUT_LENGTH}
             />
             <FormGroup legendText="Avatar">
               <FormFileUploader
                 name="avatar"
                 labelDescription="Supported file types are .jpg and .png."
-                accept={[".jpg", ".png"]}
+                fileUploaderDropContainerProps={{
+                  accept: SUPPORTED_FORMATS,
+                  labelText: "Drag and drop files here or click to upload",
+                }}
               />
             </FormGroup>
             <Button type="submit">Submit</Button>
@@ -157,6 +175,6 @@ function UserForm() {
       </FormProvider>
     </div>
   );
-}
+};
 
 export default UserForm;

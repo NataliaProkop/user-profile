@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   type PropsWithChildren,
+  type FC,
 } from "react";
 import { type UserProfile } from "../types";
 import {
@@ -27,7 +28,7 @@ export const useProfile = (): UserProfileContextType => {
   return ctx;
 };
 
-export const ProfileProvider = ({ children }: PropsWithChildren) => {
+export const ProfileProvider: FC<PropsWithChildren> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {

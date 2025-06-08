@@ -1,5 +1,7 @@
 @use "@carbon/react/scss/_spacing" as *;
 
+$cdsDatePickerPrefix: ".cds--date-picker";
+
 .user-form {
   &__title {
     margin-bottom: $spacing-07;
@@ -8,7 +10,27 @@
     width: 100%;
   }
   & &__personal-info-container {
-    padding: 0px;
+    padding: 0;
     gap: $spacing-03 $spacing-07;
+  }
+  &__date-picker {
+    width: 100%;
+    #{$cdsDatePickerPrefix} {
+      width: 100%;
+      &-container {
+        width: 100%;
+      }
+      &-input__wrapper {
+        width: 100%;
+        > span {
+          width: 100%;
+          display: inline-block;
+        }
+      }
+      &#{$cdsDatePickerPrefix}--single #{$cdsDatePickerPrefix}__input {
+        width: 100%;
+        inline-size: none;
+      }
+    }
   }
 }

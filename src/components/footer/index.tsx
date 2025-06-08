@@ -1,7 +1,8 @@
 import { Stack, Theme } from "@carbon/react";
 import "./footer.scss";
+import type { FC } from "react";
 
-export const Footer = () => {
+export const Footer: FC = () => {
   return (
     <footer className="footer">
       <Theme theme="g10">

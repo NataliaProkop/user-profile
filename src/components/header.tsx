@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FC } from "react";
 import {
   Header,
   HeaderName,
@@ -6,7 +6,6 @@ import {
   HeaderMenuItem,
   HeaderGlobalBar,
   HeaderGlobalAction,
-  SkipToContent,
   SideNav,
   SideNavItems,
   SideNavLink,
@@ -16,12 +15,11 @@ import { UserAvatar } from "@carbon/icons-react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes";
 
-export const HeaderPage = () => {
+export const HeaderPage: FC = () => {
   const [isSideNavExpanded, setIsSideNavExpanded] = useState(false);
 
   return (
     <Header aria-label="My App">
-      {/* <SkipToContent /> */}
       <HeaderMenuButton
         aria-label="Open menu"
         isActive={isSideNavExpanded}

@@ -5,8 +5,9 @@ import "./global.scss";
 import { Layout } from "@components";
 import { ROUTES } from "./routes";
 import { ProfileProvider } from "./context/user-profile.context";
+import type { FC } from "react";
 
-function App() {
+const App: FC = () => {
   return (
     <BrowserRouter>
       <Layout>
@@ -19,6 +20,6 @@ function App() {
       </Layout>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

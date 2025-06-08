@@ -13,6 +13,7 @@
     "@carbon/icons-react": "^11.61.0",
     "@carbon/react": "^1.84.0",
     "@hookform/resolvers": "^5.0.1",
+    "date-fns": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.57.0",

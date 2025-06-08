@@ -1,0 +1,53 @@
+@use "@carbon/react/scss/breakpoint" as bp;
+@use "@carbon/react/scss/_spacing" as space;
+@use "@carbon/react/scss/theme" as theme;
+
+.profile-view {
+  &__title {
+    margin-bottom: space.$spacing-07;
+  }
+
+  &__edit-button {
+    margin-left: auto;
+  }
+  &__profile-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @include bp.breakpoint("lg") {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+  &__avatar {
+    border-radius: 50%;
+    max-width: 7.5rem;
+    @include bp.breakpoint("md") {
+      max-width: 12.5rem;
+    }
+    @include bp.breakpoint("lg") {
+      max-width: 18.75rem;
+      border-radius: 10%;
+    }
+  }
+
+  &__details-box {
+    width: 100%;
+    @include bp.breakpoint("lg") {
+      padding-left: space.$spacing-07;
+      padding-right: space.$spacing-07;
+    }
+
+    dt {
+      font-weight: 600;
+    }
+
+    dd {
+      margin-bottom: space.$spacing-05;
+      color: theme.$text-secondary;
+    }
+  }
+  &__empty {
+    margin-bottom: space.$spacing-10;
+  }
+}

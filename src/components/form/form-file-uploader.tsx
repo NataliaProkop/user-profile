@@ -2,17 +2,33 @@ import { useFormContext, Controller } from "react-hook-form";
 import {
   FileUploaderDropContainer,
   type FileUploaderDropContainerProps,
+  type FileUploaderItemProps,
   FileUploaderItem,
   FormItem,
 } from "@carbon/react";
+import { getErrorMessage } from "@/utils/form-error-helpers";
+import type { FC } from "react";
 
-interface FormFileUploaderProps
-  extends Omit<FileUploaderDropContainerProps, "innerRef" | "onAddFiles"> {
+interface FormFileUploaderProps {
   name: string;
   labelDescription: string;
+  fileUploaderDropContainerProps: Omit<
+    FileUploaderDropContainerProps,
+    "innerRef" | "onAddFiles"
+  >;
+  fileUploaderItemProps?: Omit<
+    FileUploaderItemProps,
+    | "uuid"
+    | "name"
+    | "size"
+    | "status"
+    | "iconDescription"
+    | "invalid"
+    | "onDelete"
+  >;
 }
 
-export function FormFileUploader(props: FormFileUploaderProps) {
+export const FormFileUploader: FC<FormFileUploaderProps> = (props) => {
   const ctx = useFormContext();
   if (!ctx) {
     throw new Error("FormFileUploader must be used within FormProvider");
@@ -21,8 +37,13 @@ export function FormFileUploader(props: FormFileUploaderProps) {
     control,
     formState: { errors },
   } = ctx;
-  const { name, disabled, labelDescription, ...fileUploaderProps } = props;
-  const error = errors[name]?.message;
+  const {
+    name,
+    labelDescription,
+    fileUploaderDropContainerProps,
+    fileUploaderItemProps,
+  } = props;
+  const error = getErrorMessage(errors[name]);
 
   return (
     <Controller
@@ -32,30 +53,33 @@ export function FormFileUploader(props: FormFileUploaderProps) {
         <FormItem>
           <p className="cds--label-description">{labelDescription}</p>
           <FileUploaderDropContainer
-            {...fileUploaderProps}
+            {...fileUploaderDropContainerProps}
             innerRef={field.ref}
             onAddFiles={(_, { addedFiles }) => {
               field.onChange(addedFiles[0]);
+              field.onBlur();
             }}
-            disabled={!!field.value || disabled}
           />
           <>
-            {field.value ? (
+            {field.value && (
               <FileUploaderItem
+                {...fileUploaderItemProps}
                 uuid={field.value.uuid}
-                name={name}
+                name={field.value.name}
                 size={field.value.filesize}
                 status="edit"
                 iconDescription="Delete file"
                 invalid={!!error}
-                onDelete={() => field.onChange()}
+                errorSubject={error}
+                onDelete={() => {
+                  field.onChange();
+                  field.onBlur();
+                }}
               />
-            ) : (
-              <div className="cds--file-container cds--file-container--drop" />
             )}
           </>
         </FormItem>
       )}
     />
   );
-}
+};

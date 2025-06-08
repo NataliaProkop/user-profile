@@ -1,5 +1,6 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { TextArea, type TextAreaProps } from "@carbon/react";
+import { getErrorMessage } from "@/utils/form-error-helpers";
 
 interface FormTextAreaProps
   extends Omit<
@@ -19,7 +20,7 @@ export function FormTextArea(props: FormTextAreaProps) {
     formState: { errors },
   } = ctx;
   const { name, ...textAreaProps } = props;
-  const error = errors[name]?.message;
+  const error = getErrorMessage(errors[name]);
 
   return (
     <Controller
@@ -30,7 +31,7 @@ export function FormTextArea(props: FormTextAreaProps) {
           {...field}
           {...textAreaProps}
           invalid={!!error}
-          invalidText={`${errors.firstName?.message}`}
+          invalidText={error}
         />
       )}
     />

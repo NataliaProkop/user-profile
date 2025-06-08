@@ -3,17 +3,21 @@ import {
   DatePicker,
   DatePickerInput,
   type DatePickerInputProps,
+  type DatePickerProps,
 } from "@carbon/react";
+import type { FC } from "react";
+import { getErrorMessage } from "@/utils/form-error-helpers";
 
-interface FormDatePickerInputProps
-  extends Omit<
+interface FormDatePickerInputProps {
+  name: string;
+  datePickerInputProps: Omit<
     DatePickerInputProps,
     "value" | "disabled" | "onChange" | "invalid" | "invalidText"
-  > {
-  name: string;
+  >;
+  datePickerProps: Omit<DatePickerProps, "onChange" | "children">;
 }
 
-export function FormDatePickerInput(props: FormDatePickerInputProps) {
+export const FormDatePickerInput: FC<FormDatePickerInputProps> = (props) => {
   const ctx = useFormContext();
   if (!ctx) {
     throw new Error("FormDatePickerInput must be used within FormProvider");
@@ -22,17 +26,17 @@ export function FormDatePickerInput(props: FormDatePickerInputProps) {
     control,
     formState: { errors },
   } = ctx;
-  const { name, ...textInputProps } = props;
-  const error = errors[name]?.message;
+  const { name, datePickerProps, datePickerInputProps } = props;
+  const error = getErrorMessage(errors[name]);
 
   return (
     <Controller
       name={name}
       control={control}
       render={({ field }) => (
-        <DatePicker {...field} datePickerType="single" className="datepicker">
+        <DatePicker {...field} {...datePickerProps}>
           <DatePickerInput
-            {...textInputProps}
+            {...datePickerInputProps}
             invalid={!!error}
             invalidText={error}
           />
@@ -40,4 +44,4 @@ export function FormDatePickerInput(props: FormDatePickerInputProps) {
       )}
     />
   );
-}
+};
