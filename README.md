@@ -13,7 +13,7 @@ pnpm run dev
 
 ## Live Demo
 
-Check out the [Live Demo](userprofile.it-orlo.eu)
+Check out the [Live Demo](https://userprofile.it-orlo.eu/)
 
 ## Stack and Tooling Decisions, Assumptions and Comments To Implementation
 
