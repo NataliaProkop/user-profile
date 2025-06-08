@@ -1,0 +1,14 @@
+@use "@carbon/react/scss/_spacing" as *;
+
+.footer {
+  flex-shrink: 0;
+  &__container {
+    width: 99rem;
+    padding: $spacing-06;
+    max-width: 100%;
+    margin: auto;
+  }
+  &__copyright {
+    text-align: center;
+  }
+}

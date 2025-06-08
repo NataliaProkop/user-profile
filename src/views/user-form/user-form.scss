@@ -1,0 +1,14 @@
+@use "@carbon/react/scss/_spacing" as *;
+
+.user-form {
+  &__title {
+    margin-bottom: $spacing-07;
+  }
+  &__input {
+    width: 100%;
+  }
+  & &__personal-info-container {
+    padding: 0px;
+    gap: $spacing-03 $spacing-07;
+  }
+}
