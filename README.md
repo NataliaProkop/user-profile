@@ -1,6 +1,6 @@
 # User Profile App
 
-This is a small single-page React application that allows users to fill out and view a user profile form.
+This is a small single-page React application that allows users to fill form and view a user profile.
 
 ## Running the Project
 
@@ -11,7 +11,20 @@ pnpm install
 pnpm run dev
 ```
 
+## Live Demo
+
+Check out the [Live Demo](userprofile.it-orlo.eu)
+
 ## Stack and Tooling Decisions, Assumptions and Comments To Implementation
+
+### 1. PNPM
+
+I decided to use pnpm as the package manager because of faster installs and efficient disk usage – avoids duplicating dependencies.
+
+**Alternatives**:
+
+- npm – Built-in, but slower
+- yarn – Popular, but pnpm is leaner and faster
 
 ### 2. Vite
 
@@ -36,7 +49,7 @@ The form is built using React Hook Form because it is lightweight and intuitive.
 
 **Validation Assumptions**:
 
-Since the only explicit requirement was to add validation, I made the following assumptions:
+Since the only requirement was to add validation, I made the following assumptions:
 
 - Required fields: firstName, lastName, email, phone, and birthday.
 - Optional fields: about and avatar.
@@ -50,7 +63,7 @@ Since the only explicit requirement was to add validation, I made the following 
 
 ### 4. State Management via React Context
 
-Form data and user profile state are stored using React Context, which is suitable for smaller apps.
+User profile data are stored using React Context, which is suitable for smaller apps.
 
 **Alternatives**:
 
@@ -72,7 +85,8 @@ The user can upload an avatar image. On the frontend:
 **In a real-world production setup**:
 
 - Image optimization would be handled on the server or via a CDN.
-- For static images or SSR (e.g., in a Next.js app), I would use the built-in `next/image` component for optimal performance and automatic responsive behavior.
+- For SSR frameworks I would use dedicated components like `next/image` in Next.js or `gatsby-plugin-image` in Gatsby.js for optimal performance and automatic responsive behavior.
+- For static assetss Webpack/Vite plugins could be used (`vite-plugin-imagemin`, `image-webpack-loader`)
 
 ---
 
